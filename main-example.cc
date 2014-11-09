@@ -360,7 +360,20 @@ convergence_factor                  = 0.05
 
       parent_fitness = child_fitness;
     }
+    else {
+    	delta_fitness = 10 * (child_fitness - parent_fitness);
+    	prob = exp((-1.0 * delta_fitness) / temperature);
+    	if (flip(prob)) {
+    		tmp_ordering    = parent_ordering;
+    	    parent_ordering = child_ordering;
+    	    child_ordering  = tmp_ordering;
+    	    parent_fitness = child_fitness;
+    	}
+    }
 
+    if (!(iteration % iterations_per_temperature_change) && (iteration > 0)) {
+    	temperature = temperature * temperature_factor;
+    }
 
 
 

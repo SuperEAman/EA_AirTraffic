@@ -16,7 +16,7 @@
 #include <time.h>
 char ERRMSG[512];
 char* options_argument = new char[512];
-void pga_exit (int line, char* file) {
+void pga_exit (int line, const char* file) {
 	printf("ERRMSG: %s",ERRMSG);
 	printf("line: %d, file: %s", line, file);
 	exit(-1);
@@ -28,7 +28,6 @@ char * get_line_from_buffer(char * buffer, char * line) {
 		line[i] = buffer[i];
 		i ++;
 	}
-	printf("hello");
 	if (buffer[i] == '\n') {
 		line[i] = '\n';
 		return buffer + i + 1;

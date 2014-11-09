@@ -49,7 +49,6 @@ Ordering::Ordering(int n) {
 void
 Ordering::initialize(ACData *ac_data) {
 
-  int i;
 
   // find out how many flights we need to work with
   num_flights = ac_data->get_number_of_flights();
@@ -223,7 +222,13 @@ Ordering::mutate(float mutation_rate){
 
   num_mutations = (int)((float)num_flights * mutation_rate);
 
-
+  for (int i = 0; i < num_mutations; i = i + 2) {
+	  j = random_int(0, num_flights - 1);
+	  k = random_int(0, num_flights - 1);
+	  temp = ac_id_array[j];
+	  ac_id_array[j] = ac_id_array[k];
+	  ac_id_array[k] = temp;
+  }
 
 
 
@@ -249,7 +254,13 @@ Ordering::mutate_enroute_flights(float mutation_rate){
   // perform up to (num_enroute_flights*mutation_rate) mutations on the individual
 
   num_mutations = (int)((float)num_enroute_flights * mutation_rate);
-
+  for (int i = 0; i < num_mutations; i = i + 2) {
+  	  j = random_int(0, num_enroute_flights - 1);
+  	  k = random_int(0, num_enroute_flights - 1);
+  	  temp = ac_id_array[j];
+  	  ac_id_array[j] = ac_id_array[k];
+  	  ac_id_array[k] = temp;
+   }
 
 
 
@@ -276,9 +287,14 @@ Ordering::mutate_non_enroute_flights(float mutation_rate){
   
   int i, j, k, temp, num_mutations;
 
-
-
-
+  num_mutations = (int)((float)(num_flights - num_enroute_flights) * mutation_rate);
+	for (int i = 0; i < num_mutations; i = i + 2) {
+		  j = random_int(num_enroute_flights, num_flights - 1);
+		  k = random_int(num_enroute_flights, num_flights - 1);
+		  temp = ac_id_array[j];
+		  ac_id_array[j] = ac_id_array[k];
+		  ac_id_array[k] = temp;
+	 }
 
 
 
@@ -306,6 +322,23 @@ Ordering::mutate_pbm(float mutation_rate){
 
   num_mutations = (int)((float)num_flights * mutation_rate);
 
+    for (int i = 0; i < num_mutations; i = i + 2) {
+  	  j = random_int(0, num_flights - 1);
+  	  k = random_int(0, num_flights - 1);
+  	  if (j < k) {
+  		  top_index = j;
+  		  bottom_index = k;
+  	  }
+  	  else {
+  		  top_index = k;
+  		  bottom_index = j;
+  	  }
+  	  bottom_element = ac_id_array[bottom_index];
+  	  for (int m = bottom_index - 1; m >= top_index; m --) {
+  		  ac_id_array[m + 1] = ac_id_array[m];
+  	  }
+  	  ac_id_array[top_index] = bottom_element;
+    }
 
 
 
