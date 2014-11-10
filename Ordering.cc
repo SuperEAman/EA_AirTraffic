@@ -14,7 +14,10 @@
 #include "Ordering.h"
 #include "utils.h"
 #include "random.h"
+#include <set>
+#include <iostream>
 // {{{ method: default constructor
+using namespace std;
 
 Ordering::Ordering() {
 
@@ -500,14 +503,58 @@ crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2,
   const int SCHEDULED   = -1;
   const int UNSCHEDULED = -2;
 
+  int i = 0, j = 0, num_of_flight = p1->get_number_of_flights(), top_index, bottom_index, index, insert;
+  while (i == j) {
+	  i = random_int(0, num_of_flight - 1);
+	  j = random_int(0, num_of_flight - 1);
+  }
 
+  if (i < j) {
+	  top_index = i;
+	  bottom_index = j;
+  }
+  else {
+	  top_index = j;
+	  bottom_index = i;
+  }
 
+  set<int> set1 = new set<int>();
+  set<int> set2 = new set<int>();
 
+ for (int k = i; k <= j; k ++) {
+	 c1->put_ac_id(k, p1->get_ac_id(k));
+	 set1.insert(p1->get_ac_id(k));
+	 c2->put_ac_id(k, p2->get_ac_id(k));
+	 set2.insert(p2->get_ac_id(k));
+ }
 
+ index = (bottom_index + 1) % num_of_flight;
+ insert = (bottom_index + 1) % num_of_flight;
+ while (set1.size() != num_of_flight) {
+	 if (set1.find(p2->get_ac_id(index)) == set1.end()) {
+		 c1->put_ac_id(insert, p2->get_ac_id(index));
+		 set1.insert(p2->get_ac_id(index));
+		 index = (index + 1) % num_of_flight;
+		 insert = (insert + 1) % num_of_flight;
+	 }
+	 else {
+		 index = (index + 1) % num_of_flight;
+	 }
+ }
 
-
-
-
+ index = (bottom_index + 1) % num_of_flight;
+  insert = (bottom_index + 1) % num_of_flight;
+  while (set2.size() != num_of_flight) {
+ 	 if (set2.find(p1->get_ac_id(index)) == set2.end()) {
+ 		 c2->put_ac_id(insert, p1->get_ac_id(index));
+ 		 set1.insert(p1->get_ac_id(index));
+ 		 index = (index + 1) % num_of_flight;
+ 		 insert = (insert + 1) % num_of_flight;
+ 	 }
+ 	 else {
+ 		 index = (index + 1) % num_of_flight;
+ 	 }
+  }
 
 
 
