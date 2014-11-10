@@ -518,8 +518,8 @@ crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2,
 	  bottom_index = i;
   }
 
-  set<int> set1 = new set<int>();
-  set<int> set2 = new set<int>();
+  set<int> set1;
+  set<int> set2;
 
  for (int k = i; k <= j; k ++) {
 	 c1->put_ac_id(k, p1->get_ac_id(k));
