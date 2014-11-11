@@ -14,7 +14,10 @@
 #include "Ordering.h"
 #include "utils.h"
 #include "random.h"
+#include <set>
+#include <iostream>
 // {{{ method: default constructor
+using namespace std;
 
 Ordering::Ordering() {
 
@@ -49,7 +52,6 @@ Ordering::Ordering(int n) {
 void
 Ordering::initialize(ACData *ac_data) {
 
-  int i;
 
   // find out how many flights we need to work with
   num_flights = ac_data->get_number_of_flights();
@@ -223,7 +225,13 @@ Ordering::mutate(float mutation_rate){
 
   num_mutations = (int)((float)num_flights * mutation_rate);
 
-
+  for (int i = 0; i < num_mutations; i = i + 2) {
+	  j = random_int(0, num_flights - 1);
+	  k = random_int(0, num_flights - 1);
+	  temp = ac_id_array[j];
+	  ac_id_array[j] = ac_id_array[k];
+	  ac_id_array[k] = temp;
+  }
 
 
 
@@ -249,7 +257,13 @@ Ordering::mutate_enroute_flights(float mutation_rate){
   // perform up to (num_enroute_flights*mutation_rate) mutations on the individual
 
   num_mutations = (int)((float)num_enroute_flights * mutation_rate);
-
+  for (int i = 0; i < num_mutations; i = i + 2) {
+  	  j = random_int(0, num_enroute_flights - 1);
+  	  k = random_int(0, num_enroute_flights - 1);
+  	  temp = ac_id_array[j];
+  	  ac_id_array[j] = ac_id_array[k];
+  	  ac_id_array[k] = temp;
+   }
 
 
 
@@ -276,9 +290,14 @@ Ordering::mutate_non_enroute_flights(float mutation_rate){
   
   int i, j, k, temp, num_mutations;
 
-
-
-
+  num_mutations = (int)((float)(num_flights - num_enroute_flights) * mutation_rate);
+	for (int i = 0; i < num_mutations; i = i + 2) {
+		  j = random_int(num_enroute_flights, num_flights - 1);
+		  k = random_int(num_enroute_flights, num_flights - 1);
+		  temp = ac_id_array[j];
+		  ac_id_array[j] = ac_id_array[k];
+		  ac_id_array[k] = temp;
+	 }
 
 
 
@@ -306,6 +325,23 @@ Ordering::mutate_pbm(float mutation_rate){
 
   num_mutations = (int)((float)num_flights * mutation_rate);
 
+    for (int i = 0; i < num_mutations; i = i + 2) {
+  	  j = random_int(0, num_flights - 1);
+  	  k = random_int(0, num_flights - 1);
+  	  if (j < k) {
+  		  top_index = j;
+  		  bottom_index = k;
+  	  }
+  	  else {
+  		  top_index = k;
+  		  bottom_index = j;
+  	  }
+  	  bottom_element = ac_id_array[bottom_index];
+  	  for (int m = bottom_index - 1; m >= top_index; m --) {
+  		  ac_id_array[m + 1] = ac_id_array[m];
+  	  }
+  	  ac_id_array[top_index] = bottom_element;
+    }
 
 
 
@@ -467,14 +503,58 @@ crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2,
   const int SCHEDULED   = -1;
   const int UNSCHEDULED = -2;
 
+  int i = 0, j = 0, num_of_flight = p1->get_number_of_flights(), top_index, bottom_index, index, insert;
+  while (i == j) {
+	  i = random_int(0, num_of_flight - 1);
+	  j = random_int(0, num_of_flight - 1);
+  }
 
+  if (i < j) {
+	  top_index = i;
+	  bottom_index = j;
+  }
+  else {
+	  top_index = j;
+	  bottom_index = i;
+  }
 
+  set<int> set1;
+  set<int> set2;
 
+ for (int k = i; k <= j; k ++) {
+	 c1->put_ac_id(k, p1->get_ac_id(k));
+	 set1.insert(p1->get_ac_id(k));
+	 c2->put_ac_id(k, p2->get_ac_id(k));
+	 set2.insert(p2->get_ac_id(k));
+ }
 
+ index = (bottom_index + 1) % num_of_flight;
+ insert = (bottom_index + 1) % num_of_flight;
+ while (set1.size() != num_of_flight) {
+	 if (set1.find(p2->get_ac_id(index)) == set1.end()) {
+		 c1->put_ac_id(insert, p2->get_ac_id(index));
+		 set1.insert(p2->get_ac_id(index));
+		 index = (index + 1) % num_of_flight;
+		 insert = (insert + 1) % num_of_flight;
+	 }
+	 else {
+		 index = (index + 1) % num_of_flight;
+	 }
+ }
 
-
-
-
+ index = (bottom_index + 1) % num_of_flight;
+  insert = (bottom_index + 1) % num_of_flight;
+  while (set2.size() != num_of_flight) {
+ 	 if (set2.find(p1->get_ac_id(index)) == set2.end()) {
+ 		 c2->put_ac_id(insert, p1->get_ac_id(index));
+ 		 set1.insert(p1->get_ac_id(index));
+ 		 index = (index + 1) % num_of_flight;
+ 		 insert = (insert + 1) % num_of_flight;
+ 	 }
+ 	 else {
+ 		 index = (index + 1) % num_of_flight;
+ 	 }
+  }
 
 
 
