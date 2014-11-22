@@ -22,7 +22,10 @@ GreedyScheduler::GreedyScheduler(CapacityData *capacityData, ACData *acData)
 {
    
    this->capacityData = capacityData;
+//   printf(this->capacityData);
+
    this->acData = acData;
+
    this->capacityTimeData = new CapacityTimeData(capacityData);
 
    greedySchedule = NULL;
@@ -254,6 +257,13 @@ int GreedyScheduler::greedilySchedule(Ordering ordering, Boolean saveSchedule, i
 	int totalAirDelay = 0;
 
 	int numDelayedFlights =0;
+
+/**
+ * print input ordering
+ */
+//					FILE* file = fopen("result.txt","a");
+//					ordering.print(file);
+
 
 	numFlights = ordering.get_number_of_flights();
 

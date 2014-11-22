@@ -492,14 +492,13 @@ void
 crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2, 
           int thread_id, float xover_prob, xover_type_t xover_type, 
           delayed_flights_t *delayed_flights_p1, delayed_flights_t *delayed_flights_p2) {
-
+if (random_double(0.0,1.0) < xover_prob){
   //------------------------------------------------------------------------------
   // Note on the arguments:
   //   delayed_flights pointers are only used when xover_type=POSITION_BASED_BIASED
   //   otherwise, they are ignored.  To turn on collection of delayed_flights,
   //   set USE_DELAYED_FLIGHTS to 1 in pga.h
   //------------------------------------------------------------------------------
-
   const int SCHEDULED   = -1;
   const int UNSCHEDULED = -2;
 
@@ -509,6 +508,8 @@ crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2,
 	  j = random_int(0, num_of_flight - 1);
   }
 
+
+
   if (i < j) {
 	  top_index = i;
 	  bottom_index = j;
@@ -517,11 +518,12 @@ crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2,
 	  top_index = j;
 	  bottom_index = i;
   }
-
   set<int> set1;
   set<int> set2;
 
- for (int k = i; k <= j; k ++) {
+
+
+ for (int k = top_index; k <= bottom_index; k ++) {
 	 c1->put_ac_id(k, p1->get_ac_id(k));
 	 set1.insert(p1->get_ac_id(k));
 	 c2->put_ac_id(k, p2->get_ac_id(k));
@@ -530,43 +532,52 @@ crossover(Ordering *p1, Ordering *p2, Ordering *c1, Ordering *c2,
 
  index = (bottom_index + 1) % num_of_flight;
  insert = (bottom_index + 1) % num_of_flight;
+
+
+
  while (set1.size() != num_of_flight) {
 	 if (set1.find(p2->get_ac_id(index)) == set1.end()) {
 		 c1->put_ac_id(insert, p2->get_ac_id(index));
 		 set1.insert(p2->get_ac_id(index));
 		 index = (index + 1) % num_of_flight;
 		 insert = (insert + 1) % num_of_flight;
+
 	 }
 	 else {
 		 index = (index + 1) % num_of_flight;
+
 	 }
  }
-
  index = (bottom_index + 1) % num_of_flight;
   insert = (bottom_index + 1) % num_of_flight;
+
   while (set2.size() != num_of_flight) {
+
  	 if (set2.find(p1->get_ac_id(index)) == set2.end()) {
+
  		 c2->put_ac_id(insert, p1->get_ac_id(index));
- 		 set1.insert(p1->get_ac_id(index));
+ 		 set2.insert(p1->get_ac_id(index));
  		 index = (index + 1) % num_of_flight;
  		 insert = (insert + 1) % num_of_flight;
  	 }
  	 else {
+
  		 index = (index + 1) % num_of_flight;
  	 }
   }
 
 
+  set1.clear();
+  set2.clear();
 
 
+}
 
 
-
-
-
-
-
-
+else{
+	c1->copy(p1);
+	c2->copy(p2);
+}
 
 
 
